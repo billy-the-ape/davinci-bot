@@ -1,12 +1,40 @@
 import { Client, Message } from 'discord.js';
 import { createCompletion } from '../../openai';
-import { getMember } from '../util';
+import { getMember, sleep } from '../util';
+
+const MAX_DEPTH = 3;
+const BOT_NAME = 'Marv';
+const HUMAN_NAME = 'Human';
+const STOP = [` ${HUMAN_NAME}`, ` ${BOT_NAME}`];
+// eslint-disable-next-line max-len
+const BEHAVIOR = `${BOT_NAME} is a chatbot that answers questions with ${process.env.OPENAI_BEHAVIOR} responses:`;
+
+const getMessageChain = async (
+  message: Message<boolean>,
+  botId: string,
+  depth = 0
+): Promise<string> => {
+  const isBot = message.member?.user.id === botId;
+  const resp = `${isBot ? BOT_NAME : HUMAN_NAME}: ${message.content}`;
+  if (depth >= MAX_DEPTH) return '';
+
+  if (message.reference && message.reference.messageId) {
+    const prevMessage = await message.fetchReference();
+    if (prevMessage) {
+      const prevContent = await getMessageChain(prevMessage, botId, depth + 1);
+      return (prevContent ? prevContent + '\n' : '') + resp;
+    }
+  }
+
+  return resp;
+};
 
 export const messageHandler =
   (client: Client) => async (message: Message<boolean>) => {
     if (!client.user) {
       return;
     }
+    await sleep(600);
     const testIds = [`\\<@${client.user?.id}\\>`];
     if (message.guild) {
       const member = await getMember(message.guild!, client.user.id);
@@ -21,17 +49,24 @@ export const messageHandler =
       console.info('AT ME DAWG');
       await message.channel.sendTyping();
 
-      const questionContent = message.content.replace(reg, '');
+      const questionContent = `${BEHAVIOR}\n\n${await getMessageChain(
+        message,
+        client.user.id
+      )}`;
+
+      console.info({ questionContent });
 
       try {
-        const response = await createCompletion(questionContent);
+        const response = await createCompletion(questionContent, STOP);
 
         const result = response.data;
         console.info(response.data);
 
         try {
           await message.reply({
-            content: result.choices[0]?.text,
+            content: result.choices[0]?.text
+              ?.replace(new RegExp(`${BOT_NAME}: ?`), '')
+              .trim(),
           });
         } catch (e: any) {
           console.error(`Error sending message: ${e.message}`);

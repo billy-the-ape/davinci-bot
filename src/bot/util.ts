@@ -1,7 +1,7 @@
-import { Client, Guild, TextChannel } from "discord.js";
+import { Client, Guild, TextChannel } from 'discord.js';
 
 export const getChannel = async (client: Client, channelId?: string) => {
-  if (!channelId || channelId === "undefined") return null;
+  if (!channelId || channelId === 'undefined') return null;
 
   try {
     const result = client.channels.cache.get(channelId);
@@ -10,7 +10,7 @@ export const getChannel = async (client: Client, channelId?: string) => {
 
     return (await client.channels.fetch(channelId)) as TextChannel;
   } catch (e: any) {
-    if (e.message === "Unknown Channel" || e.message === "Missing Access") {
+    if (e.message === 'Unknown Channel' || e.message === 'Missing Access') {
       return null;
     }
     // await logError("tsitsi", e, `bot-interface`, JSON.stringify({ channelId }));
@@ -28,14 +28,30 @@ export const getMember = async (guild: Guild, discordUserId?: string) => {
 
     return await guild.members.fetch(discordUserId);
   } catch (e: any) {
-    if (e.message === "Unknown Member") {
+    if (e.message === 'Unknown Member') {
       return null;
     }
     console.error(
-      "ERROR",
+      'ERROR',
       e.Message,
       JSON.stringify({ guildId: guild.id, discordUserId })
     );
     return null;
   }
 };
+
+export const getMessage = async (channel: TextChannel, messageId?: string) => {
+  if (!messageId) return null;
+
+  const result = channel.messages.cache.get(messageId);
+  if (result) {
+    return result;
+  }
+
+  return await channel.messages.fetch(messageId);
+};
+
+export const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
