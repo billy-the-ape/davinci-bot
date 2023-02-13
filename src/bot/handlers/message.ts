@@ -12,6 +12,7 @@ const BEHAVIOR = `${BOT_NAME} is a chatbot that answers questions with ${process
 const getMessageChain = async (
   message: Message<boolean>,
   botId: string,
+  reg: RegExp,
   depth = 0
 ): Promise<string> => {
   const isBot = message.member?.user.id === botId;
@@ -21,7 +22,9 @@ const getMessageChain = async (
   if (message.reference && message.reference.messageId) {
     const prevMessage = await message.fetchReference();
     if (prevMessage) {
-      const prevContent = await getMessageChain(prevMessage, botId, depth + 1);
+      const prevContent = (
+        await getMessageChain(prevMessage, botId, reg, depth + 1)
+      ).replace(reg, BOT_NAME);
       return (prevContent ? prevContent + '\n' : '') + resp;
     }
   }
@@ -51,7 +54,8 @@ export const messageHandler =
 
       const questionContent = `${BEHAVIOR}\n\n${await getMessageChain(
         message,
-        client.user.id
+        client.user.id,
+        reg
       )}`;
 
       console.info({ questionContent });
