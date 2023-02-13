@@ -1,11 +1,6 @@
-import { Client, Message } from "discord.js";
-import { createCompletion } from "../../openai";
-import { getMember } from "../util";
-
-const TWO_SPACE_REG = /  /g;
-const TICKET_TOOL_ID = "557628352828014614";
-const TICKET_TOOL_USERID_REG = /^\<@([0-9]*)\>/;
-const TICKET_TOOL_MESSAGE_PARSER = /`(.*)`/;
+import { Client, Message } from 'discord.js';
+import { createCompletion } from '../../openai';
+import { getMember } from '../util';
 
 export const messageHandler =
   (client: Client) => async (message: Message<boolean>) => {
@@ -21,39 +16,29 @@ export const messageHandler =
     }
 
     const mentioned = !!message.mentions.users.get(client.user.id!);
-    const reg = new RegExp(testIds.join("|"), "g");
+    const reg = new RegExp(testIds.join('|'), 'g');
     if (mentioned || reg.test(message.content)) {
-      console.log("AT ME DAWG");
+      console.info('AT ME DAWG');
       await message.channel.sendTyping();
 
-      let pingUser = "";
-      let questionContent = message.content
-        .replace(reg, "")
-        .replace(TWO_SPACE_REG, "");
+      const questionContent = message.content.replace(reg, '');
 
-      if (message.member?.user.id === TICKET_TOOL_ID) {
-        const desc = message.embeds[1]?.description;
-        console.log({ desc });
-        if (desc) {
-          const contentExec = TICKET_TOOL_MESSAGE_PARSER.exec(desc);
-          if (contentExec) {
-            questionContent = contentExec[1];
-          }
+      try {
+        const response = await createCompletion(questionContent);
 
-          const userExec = TICKET_TOOL_USERID_REG.exec(message.content);
-          if (userExec) {
-            pingUser = `<@${userExec[1]}>`;
-          }
+        const result = response.data;
+        console.info(response.data);
+
+        try {
+          await message.reply({
+            content: result.choices[0]?.text,
+          });
+        } catch (e: any) {
+          console.error(`Error sending message: ${e.message}`);
         }
+      } catch (e: any) {
+        console.error(`Error getting content: ${e.message}`);
+        console.error(questionContent);
       }
-
-      const response = await createCompletion(questionContent);
-
-      const result = response.data;
-      console.log(response.data);
-
-      await message.reply({
-        content: (pingUser ? pingUser + " " : "") + result.choices[0]?.text,
-      });
     }
   };

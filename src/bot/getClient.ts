@@ -1,4 +1,4 @@
-import { Caches, Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits } from 'discord.js';
 
 /* const thingsToDefaultCache = [
   "GuildChannelManager",
@@ -9,11 +9,11 @@ import { Caches, Client, GatewayIntentBits } from "discord.js";
   'GuildMemberManager',
 ]; */
 
-const thingsToPartiallyCache: Partial<Record<keyof Caches, number>> = {
-  /* GuildMemberManager: 500, */
-};
+/* const thingsToPartiallyCache: Partial<Record<keyof Caches, number>> = {
+  GuildMemberManager: 500,
+}; */
 
-export const getClient = (token: string, includePartials = false) => {
+export const getClient = (token: string /* , includePartials = false */) => {
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
@@ -55,6 +55,6 @@ export const waitForReady = async (client: Client) => {
   }
 
   return new Promise<void>((resolve) => {
-    (client as Client).on("ready", () => resolve());
+    (client as Client).on('ready', () => resolve());
   });
 };
