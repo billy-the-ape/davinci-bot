@@ -3,11 +3,13 @@ import { createCompletion } from '../../openai';
 import { getMember, sleep } from '../util';
 
 const MAX_DEPTH = 3;
-const BOT_NAME = 'Marv';
+const BOT_NAME = process.env.OPENAI_NAME!;
 const HUMAN_NAME = 'Human';
 const STOP = [` ${HUMAN_NAME}`, ` ${BOT_NAME}`];
 // eslint-disable-next-line max-len
 const BEHAVIOR = `${BOT_NAME} is a chatbot that answers questions with ${process.env.OPENAI_BEHAVIOR} responses:`;
+
+const RESPOND_PROMPTS = (() => process.env.RESPOND_PROMPTS?.split(',') ?? [])();
 
 const getMessageChain = async (
   message: Message<boolean>,
@@ -48,7 +50,11 @@ export const messageHandler =
 
     const mentioned = !!message.mentions.users.get(client.user.id!);
     const reg = new RegExp(testIds.join('|'), 'g');
-    if (mentioned || reg.test(message.content)) {
+    if (
+      mentioned ||
+      reg.test(message.content) ||
+      RESPOND_PROMPTS.includes(message.content.toLocaleLowerCase().trim())
+    ) {
       console.info('AT ME DAWG');
       await message.channel.sendTyping();
 
@@ -69,7 +75,8 @@ export const messageHandler =
         try {
           await message.reply({
             content: result.choices[0]?.text
-              ?.replace(new RegExp(`${BOT_NAME}: ?`), '')
+              ?.replace(new RegExp(`${BOT_NAME}\: ?`), '')
+              .replace(/^(\?|\!)/, '')
               .trim(),
           });
         } catch (e: any) {
