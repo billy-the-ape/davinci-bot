@@ -55,7 +55,6 @@ export const messageHandler =
       reg.test(message.content) ||
       RESPOND_PROMPTS.includes(message.content.toLocaleLowerCase().trim())
     ) {
-      console.info('AT ME DAWG');
       await message.channel.sendTyping();
 
       const questionContent = `${BEHAVIOR}\n\n${await getMessageChain(
@@ -64,13 +63,13 @@ export const messageHandler =
         reg
       )}`;
 
-      console.info({ questionContent });
+      console.info({ now: new Date(), questionContent });
 
       try {
         const response = await createCompletion(questionContent, STOP);
 
         const result = response.data;
-        console.info(response.data);
+        console.info({ now: new Date(), ...response.data });
 
         try {
           await message.reply({
