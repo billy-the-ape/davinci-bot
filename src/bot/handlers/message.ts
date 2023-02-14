@@ -1,4 +1,4 @@
-import { Client, Message } from 'discord.js';
+import { Client, Message, TextChannel } from 'discord.js';
 import { createCompletion } from '../../openai';
 import { getMember, sleep } from '../util';
 
@@ -63,7 +63,12 @@ export const messageHandler =
         reg
       )}`;
 
-      console.info({ now: new Date(), questionContent });
+      console.info({
+        now: new Date(),
+        server: message.guild?.name,
+        channel: (message.channel as TextChannel)?.name,
+        questionContent,
+      });
 
       try {
         const response = await createCompletion(questionContent, STOP);
