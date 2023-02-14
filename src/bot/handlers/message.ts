@@ -75,7 +75,8 @@ export const messageHandler =
         try {
           await message.reply({
             content: result.choices[0]?.text
-              ?.replace(new RegExp(`^.*${BOT_NAME}\: `), '')
+              ?.replace(/\n/g, '')
+              .replace(new RegExp(`^.*${BOT_NAME}\: `), '')
               .trim(),
           });
         } catch (e: any) {
