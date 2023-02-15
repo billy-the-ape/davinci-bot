@@ -1,6 +1,6 @@
 # Davinci Bot
 
-### Making AI Bot Simple
+### Making Discord + AI Simple
 
 Davinci Bot is an easily configurable OpenAI Powered Discord Bot
 
