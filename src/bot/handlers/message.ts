@@ -71,6 +71,7 @@ export const messageHandler =
       });
 
       try {
+        console.info('Sending request...');
         const response = await createCompletion(questionContent, STOP);
 
         const result = response.data;
