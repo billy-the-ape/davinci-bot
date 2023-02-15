@@ -77,8 +77,6 @@ export const messageHandler = (
       reg.test(message.content) ||
       autoRespondPrompts.includes(message.content.toLocaleLowerCase().trim())
     ) {
-      await message.channel.sendTyping();
-
       const questionContent = `${behaviorString}\n\n${await getMessageChain(
         message,
         client.user.id,
@@ -93,6 +91,7 @@ export const messageHandler = (
       });
 
       try {
+        await message.channel.sendTyping();
         log('Sending request...');
         const response = await createCompletion(questionContent);
 
