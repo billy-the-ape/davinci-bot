@@ -1,9 +1,11 @@
-import { getClient } from "./getClient";
-import { ready } from "./ready";
+import { log } from '../log';
+import { ConfigType } from '../types';
+import { getClient } from './getClient';
+import { ready } from './ready';
 
-export const startBot = async () => {
-  console.info("Bot starting...");
-  const client = getClient(process.env.DISCORD_BOT_TOKEN!);
+export const startBot = async (config: ConfigType) => {
+  log('Bot starting...');
+  const client = getClient(config.botToken);
 
-  ready(client);
+  ready(client, config);
 };

@@ -1,13 +1,20 @@
 import { Client } from 'discord.js';
+import { log } from '../log';
+import { ConfigType } from '../types';
 import { messageHandler } from './handlers/message';
 
-export const ready = (client: Client) => {
-  client.on('messageCreate', messageHandler(client));
+export const ready = (client: Client, config: ConfigType) => {
+  client.on('messageCreate', messageHandler(client, config));
 
   client.on('ready', () => {
-    console.info(`Bot ready!`, {
-      model: process.env.OPENAI_MODEL,
-      behavior: process.env.OPENAI_BEHAVIOR,
+    log(`Bot ready!`);
+    log({
+      ...config,
+      openai: {
+        ...config.openai,
+        apiKey: '****',
+      },
+      botToken: '****',
     });
   });
 };

@@ -1,4 +1,5 @@
 import { Client, Guild, TextChannel } from 'discord.js';
+import { log } from '../log';
 
 export const getChannel = async (client: Client, channelId?: string) => {
   if (!channelId || channelId === 'undefined') return null;
@@ -13,6 +14,11 @@ export const getChannel = async (client: Client, channelId?: string) => {
     if (e.message === 'Unknown Channel' || e.message === 'Missing Access') {
       return null;
     }
+    log(
+      'An error occurred getting a channel',
+      e.Message,
+      JSON.stringify({ channelId })
+    );
     // await logError("tsitsi", e, `bot-interface`, JSON.stringify({ channelId }));
     return null;
   }
@@ -31,8 +37,8 @@ export const getMember = async (guild: Guild, discordUserId?: string) => {
     if (e.message === 'Unknown Member') {
       return null;
     }
-    console.error(
-      'ERROR',
+    log(
+      'An error occurred getting a server member',
       e.Message,
       JSON.stringify({ guildId: guild.id, discordUserId })
     );
