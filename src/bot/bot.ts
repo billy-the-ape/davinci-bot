@@ -8,4 +8,6 @@ export const startBot = async (config: ConfigType) => {
   const client = getClient(config.botToken);
 
   ready(client, config);
+
+  return client;
 };

@@ -4,7 +4,7 @@ import { ConfigType } from 'src/types';
 import { log } from '../../log';
 import { getMember, sleep } from '../util';
 
-const MAX_DEPTH = 3;
+const MAX_CONVERSATIONAL_DEPTH = process.env.MAX_CONVERSATIONAL_DEPTH || 3;
 const HUMAN_NAME = 'Human';
 
 export const messageHandler = (
@@ -26,7 +26,7 @@ export const messageHandler = (
   ): Promise<string> => {
     const isBot = message.member?.user.id === botId;
     const resp = `${isBot ? name : HUMAN_NAME}: ${message.content}`;
-    if (depth >= MAX_DEPTH) return '';
+    if (depth >= MAX_CONVERSATIONAL_DEPTH) return '';
 
     if (message.reference && message.reference.messageId) {
       const prevMessage = await message.fetchReference();
