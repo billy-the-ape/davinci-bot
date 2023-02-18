@@ -1,17 +1,26 @@
 import { Client, Message, TextChannel } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
-import { ConfigType } from 'src/types';
 import { log } from '../../log';
-import { getMember, sleep } from '../util';
+import { ConfigType } from '../../types';
+import { getMember, random, sleep } from '../util';
 
-const MAX_CONVERSATIONAL_DEPTH = process.env.MAX_CONVERSATIONAL_DEPTH || 3;
 const HUMAN_NAME = 'Human';
 
 export const messageHandler = (
   client: Client,
   {
-    openai: { name, behavior, apiKey, model, temperature, maxTokens },
+    openai: {
+      name,
+      behavior,
+      apiKey,
+      model,
+      temperature,
+      maxTokens,
+      conversationalDepth,
+    },
     autoRespondPrompts,
+    respondDelay,
+    respondDelayTo,
   }: ConfigType
 ) => {
   const stop = [` ${HUMAN_NAME}`, ` ${name}`];
@@ -26,7 +35,7 @@ export const messageHandler = (
   ): Promise<string> => {
     const isBot = message.member?.user.id === botId;
     const resp = `${isBot ? name : HUMAN_NAME}: ${message.content}`;
-    if (depth >= MAX_CONVERSATIONAL_DEPTH) return '';
+    if (depth >= conversationalDepth) return '';
 
     if (message.reference && message.reference.messageId) {
       const prevMessage = await message.fetchReference();
@@ -61,7 +70,6 @@ export const messageHandler = (
     if (!client.user) {
       return;
     }
-    await sleep(600);
     const testIds = [`\\<@${client.user?.id}\\>`];
     if (message.guild) {
       const member = await getMember(message.guild!, client.user.id);
@@ -91,6 +99,15 @@ export const messageHandler = (
       });
 
       try {
+        if (respondDelay) {
+          if (!respondDelayTo || message.member?.user.id === respondDelayTo) {
+            const delay = respondDelay + random(0, respondDelay);
+            console.info(`Waiting ${delay / 1000} seconds to respond...`);
+            await sleep(respondDelay + random(0, respondDelay));
+          }
+        } else {
+          await sleep(600);
+        }
         await message.channel.sendTyping();
         log('Sending request...');
         const response = await createCompletion(questionContent);

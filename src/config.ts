@@ -16,8 +16,15 @@ export const config: ConfigType = {
     maxTokens: process.env.OPENAI_MAX_TOKENS
       ? Number(process.env.OPENAI_MAX_TOKENS)
       : 1000,
+    conversationalDepth: process.env.MAX_CONVERSATIONAL_DEPTH
+      ? Number(process.env.OPENAI_CONVERSATIONAL_DEPTH)
+      : 3,
   },
   autoRespondPrompts: process.env.RESPOND_PROMPTS?.split(',') || [],
+  respondDelay: process.env.RESPOND_DELAY
+    ? Number(process.env.RESPOND_DELAY)
+    : undefined,
+  respondDelayTo: process.env.RESPOND_DELAY_TO,
   noLog: process.env.NO_LOG === 'true',
   botToken: process.env.DISCORD_BOT_TOKEN || '',
 };

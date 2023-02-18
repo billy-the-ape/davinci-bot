@@ -6,8 +6,11 @@ export type ConfigType = {
     name: string;
     temperature: number;
     maxTokens: number;
+    conversationalDepth: number;
   };
   autoRespondPrompts: string[];
+  respondDelay: number | undefined;
+  respondDelayTo: string | undefined;
   noLog: boolean;
   botToken: string;
 };

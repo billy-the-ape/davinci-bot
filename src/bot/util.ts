@@ -61,3 +61,7 @@ export const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
+
+export const random = (min: number, max: number) => {
+  return min + Math.random() * (max - min);
+};
