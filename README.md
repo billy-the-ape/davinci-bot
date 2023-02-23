@@ -52,6 +52,14 @@ Temperature of the bot. [More info here](https://platform.openai.com/docs/api-re
 
 Max tokens of the bot reponse. [More info here](https://platform.openai.com/docs/api-reference/completions/create#completions/create-max_tokens). Defaults to `1000` if no value is set.
 
+#### `RESPOND_DELAY`
+
+Delay response when one is triggered. This is more useful if you want to have multiple instances of the bot talking to each other (so they don't spam)
+
+#### `RESPOND_DELAY_TO`
+
+ID of the Discord user to respond delay to. If not included, will delay response to all users if `RESPOND_DELAY` is set
+
 #### `NO_LOG`
 
 If set to `true`, the node application will not log to the terminal.
