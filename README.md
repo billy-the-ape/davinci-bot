@@ -22,7 +22,7 @@ Configuration is done within the `.env.local` file you created above. Here are d
 
 #### `DISCORD_BOT_TOKEN` \*Required
 
-Set up your Discord bot in the [Discord Developer Portal](https://discord.com/developers/applications) ([More info](https://discord.com/developers/docs/getting-started#creating-an-app)). Paste the token you receive in this process into this variable.
+Set up your Discord bot in the [Discord Developer Portal](https://discord.com/developers/applications) ([More info](https://discord.com/developers/docs/getting-started#creating-an-app)). Paste the token you receive in this process into this variable. _Note: Your bot will need to have the "Message Content Intent" turned on in order to read and respond to messages._
 
 #### `OPENAI_API_KEY` \*Required
 
