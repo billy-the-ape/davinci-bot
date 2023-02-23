@@ -11,8 +11,8 @@ Davinci Bot is an easily configurable OpenAI Powered Discord Bot
 1. [Install nodejs 16+](https://nodejs.org/en/download/)
 2. Install yarn with `npm install -g yarn`
 3. Install packages with `yarn`
-4. Build with `yarn build` and start with `yarn start` (or use `yarn dev` to do both in one step!)
-5. Copy `.env.example` to `.env.local` and populate the values to configure (or use as a template for environment variables on your server)
+4. Copy `.env.example` to `.env.local` and populate the values to configure (or use as a template for environment variables on your server)
+5. Build with `yarn build` and start with `yarn start` (or use `yarn dev` to do both in one step!)
 
 ---
 
