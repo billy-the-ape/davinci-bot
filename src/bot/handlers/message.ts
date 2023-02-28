@@ -108,7 +108,9 @@ export const messageHandler = (
         } else {
           await sleep(600);
         }
-        await message.channel.sendTyping();
+        if (message.channel.isTextBased()) {
+          await (message.channel as any).sendTyping();
+        }
         log('Sending request...');
         const response = await createCompletion(questionContent);
 
