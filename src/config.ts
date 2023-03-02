@@ -21,7 +21,7 @@ export const config: ConfigType = {
       : 3,
   },
   autoRespondPrompts: process.env.RESPOND_PROMPTS
-    ? process.env.RESPOND_PROMPTS.split(',')
+    ? process.env.RESPOND_PROMPTS.split(',').filter((val) => !!val?.trim())
     : [],
   respondDelay: process.env.RESPOND_DELAY
     ? Number(process.env.RESPOND_DELAY)
