@@ -20,7 +20,9 @@ export const config: ConfigType = {
       ? Number(process.env.OPENAI_CONVERSATIONAL_DEPTH)
       : 3,
   },
-  autoRespondPrompts: process.env.RESPOND_PROMPTS?.split(',') || [],
+  autoRespondPrompts: process.env.RESPOND_PROMPTS
+    ? process.env.RESPOND_PROMPTS.split(',')
+    : [],
   respondDelay: process.env.RESPOND_DELAY
     ? Number(process.env.RESPOND_DELAY)
     : undefined,

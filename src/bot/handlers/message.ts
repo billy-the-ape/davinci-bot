@@ -83,7 +83,8 @@ export const messageHandler = (
     if (
       mentioned ||
       reg.test(message.content) ||
-      autoRespondPrompts.includes(message.content.toLocaleLowerCase().trim())
+      (autoRespondPrompts.length &&
+        autoRespondPrompts.includes(message.content.toLocaleLowerCase().trim()))
     ) {
       const questionContent = `${behaviorString}\n\n${await getMessageChain(
         message,
@@ -102,7 +103,7 @@ export const messageHandler = (
         if (respondDelay) {
           if (!respondDelayTo || message.member?.user.id === respondDelayTo) {
             const delay = respondDelay + random(0, respondDelay);
-            console.info(`Waiting ${delay / 1000} seconds to respond...`);
+            log(`Waiting ${delay / 1000} seconds to respond...`);
             await sleep(respondDelay + random(0, respondDelay));
           }
         } else {
