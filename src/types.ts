@@ -14,3 +14,8 @@ export type ConfigType = {
   noLog: boolean;
   botToken: string;
 };
+
+export type ChatCompletionMessage = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};

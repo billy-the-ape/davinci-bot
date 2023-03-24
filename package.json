@@ -1,8 +1,8 @@
 {
-  "name": "opensupport",
-  "version": "1.0.0",
+  "name": "openai-bot",
+  "version": "2.0.0",
   "main": "index.js",
-  "repository": "https://github.com/wack-overflow/opensupport.git",
+  "repository": "https://github.com/wack-overflow/davinci-bot.git",
   "author": "billytheape.eth <cryptobilly37@gmail.com>",
   "license": "MIT",
   "scripts": {

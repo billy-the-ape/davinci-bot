@@ -1,7 +1,7 @@
 import { Client, Message, TextChannel } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { log } from '../../log';
-import { ConfigType } from '../../types';
+import type { ChatCompletionMessage, ConfigType } from '../../types';
 import { getMember, random, sleep } from '../util';
 
 const HUMAN_NAME = 'Human';
@@ -23,31 +23,38 @@ export const messageHandler = (
     respondDelayTo,
   }: ConfigType
 ) => {
-  const stop = [` ${HUMAN_NAME}`, ` ${name}`];
   // eslint-disable-next-line max-len
-  const behaviorString = `${name} is a chatbot that answers questions with ${behavior} responses:`;
+  const behaviorItem: ChatCompletionMessage = {
+    role: 'system',
+    content: `You are a ${behavior}`,
+  };
 
   const getMessageChain = async (
     message: Message<boolean>,
     botId: string,
-    reg: RegExp,
     depth = 0
-  ): Promise<string> => {
+  ): Promise<ChatCompletionMessage[]> => {
     const isBot = message.member?.user.id === botId;
-    const resp = `${isBot ? name : HUMAN_NAME}: ${message.content}`;
-    if (depth >= conversationalDepth) return '';
+    const resp: ChatCompletionMessage = {
+      role: isBot ? 'assistant' : 'user',
+      content: message.content,
+    };
+
+    if (depth >= conversationalDepth) return [];
 
     if (message.reference && message.reference.messageId) {
       const prevMessage = await message.fetchReference();
       if (prevMessage) {
-        const prevContent = (
-          await getMessageChain(prevMessage, botId, reg, depth + 1)
-        ).replace(reg, name);
-        return (prevContent ? prevContent + '\n' : '') + resp;
+        const prevContent = await getMessageChain(
+          prevMessage,
+          botId,
+          depth + 1
+        );
+        return [...prevContent, resp];
       }
     }
 
-    return resp;
+    return [resp];
   };
 
   const configuration = new Configuration({
@@ -56,13 +63,12 @@ export const messageHandler = (
 
   const openai = new OpenAIApi(configuration);
 
-  const createCompletion = async (prompt: string) => {
-    return await openai.createCompletion({
+  const createCompletion = async (messages: ChatCompletionMessage[]) => {
+    return await openai.createChatCompletion({
       model,
-      prompt,
+      messages,
       temperature,
       max_tokens: maxTokens,
-      stop,
     });
   };
 
@@ -86,11 +92,10 @@ export const messageHandler = (
       (autoRespondPrompts.length &&
         autoRespondPrompts.includes(message.content.toLocaleLowerCase().trim()))
     ) {
-      const questionContent = `${behaviorString}\n\n${await getMessageChain(
-        message,
-        client.user.id,
-        reg
-      )}`;
+      const questionContent = [
+        behaviorItem,
+        ...(await getMessageChain(message, client.user.id)),
+      ];
 
       log({
         now: new Date(),
@@ -116,14 +121,11 @@ export const messageHandler = (
         const response = await createCompletion(questionContent);
 
         const result = response.data;
-        log({ now: new Date(), ...response.data });
+        log(JSON.stringify({ now: new Date(), ...response.data }, null, 2));
 
         try {
           await message.reply({
-            content: result.choices[0]?.text
-              ?.replace(/\n/g, '')
-              .replace(new RegExp(`^.*${name}\: `), '')
-              .trim(),
+            content: result.choices[0]?.message?.content,
           });
         } catch (e: any) {
           log(`Error sending message: ${e.message}`);
